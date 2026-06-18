@@ -1409,10 +1409,10 @@ impl StreamableParser {
         }
 
         let mut recipient: Option<String> = None;
-        let mut content_type: Option<String> = None;
+        let mut content_type_str: Vec<String> = vec![];
         let remaining_content: Option<String>;
 
-        if parse_recipient_and_type && !parts.is_empty() {
+        while !parts.is_empty() && parse_recipient_and_type {
             let num_parts = parts.len();
             // SAFETY: we know that there is at least one part remaining, because of is_empty check above
             let last_part = parts.pop().unwrap();
@@ -1426,32 +1426,23 @@ impl StreamableParser {
                 recipient = Some(last_part.to_string());
             } else {
                 // More than one token and the last one is not a recipient -> treat as content-type.
-                content_type = Some(last_part.to_string());
-
-                // After removing the content-type there may be exactly one token describing the recipient.
-                if let Some(raw_recipient) = parts.pop() {
-                    recipient = if let Some(stripped) = raw_recipient.strip_prefix("to=") {
-                        Some(stripped.to_string())
-                    } else {
-                        Some(raw_recipient.to_string())
-                    };
-                }
+                content_type_str.push(last_part.to_string());
             }
-
-            // Any remaining parts are content (not header metadata)
-            remaining_content = if !parts.is_empty() {
-                Some(parts.join(" "))
-            } else {
-                None
-            };
-        } else {
-            // Treat all remaining parts as content when not parsing recipient and content type
-            remaining_content = if !parts.is_empty() {
-                Some(parts.join(" "))
-            } else {
-                None
-            };
         }
+
+        content_type_str.reverse();
+        let content_type = if content_type_str.is_empty() {
+            None
+        } else {
+            Some(content_type_str.join(""))
+        };
+
+        // Treat all remaining parts as content when not parsing recipient and content type
+        remaining_content = if !parts.is_empty() {
+            Some(parts.join(" "))
+        } else {
+            None
+        };
 
         let author = if role == Role::Tool {
             let name = role_str_opt;

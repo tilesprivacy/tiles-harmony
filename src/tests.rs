@@ -886,3 +886,48 @@ fn test_parse_completion_with_invalid_content_token_errors_on_eos() {
             .with_channel("analysis");
     assert_eq!(parsed_message, &expected_message);
 }
+
+#[test]
+fn test_streamable_parser_must_consume_entire_header() {
+    let encoding = load_harmony_encoding(HarmonyEncodingName::HarmonyGptOss).unwrap();
+    let mut _parser = StreamableParser::new(encoding.clone(), None).unwrap();
+
+    // whatever comes after receipient should be treated as content-type
+    let start_tokens = encoding.tokenizer().encode_with_special_tokens(
+       "<|start|>assistant<|channel|>commentary to=functions.get_current_weather<|constrain|> json<|message|>{\"location\":\"San Francisco\"}<|call|>"
+    );
+
+    let _parsed = encoding
+        .parse_messages_from_completion_tokens(start_tokens, None)
+        .expect("expected to parse");
+}
+
+#[test]
+fn test_streamable_parser_must_consume_entire_header2() {
+    let encoding = load_harmony_encoding(HarmonyEncodingName::HarmonyGptOss).unwrap();
+    let mut _parser = StreamableParser::new(encoding.clone(), None).unwrap();
+
+    // whatever comes after receipient should be treated as content-type
+    let start_tokens = encoding.tokenizer().encode_with_special_tokens(
+       "<|start|>assistant<|channel|>commentary to=functions.get_current_weather<|constrain|>json<|message|>{\"location\":\"San Francisco\"}<|call|>"
+    );
+
+    let _parsed = encoding
+        .parse_messages_from_completion_tokens(start_tokens, None)
+        .expect("expected to parse");
+}
+
+#[test]
+fn test_streamable_parser_must_consume_entire_header3() {
+    let encoding = load_harmony_encoding(HarmonyEncodingName::HarmonyGptOss).unwrap();
+    let mut _parser = StreamableParser::new(encoding.clone(), None).unwrap();
+
+    // whatever comes after receipient should be treated as content-type
+    let start_tokens = encoding.tokenizer().encode_with_special_tokens(
+       "<|start|>assistant<|channel|>commentary to=functions.get_current_weather<|message|>{\"location\":\"San Francisco\"}<|call|>"
+    );
+
+    let _parsed = encoding
+        .parse_messages_from_completion_tokens(start_tokens, None)
+        .expect("expected to parse");
+}
