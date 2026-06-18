@@ -1,9 +1,9 @@
 [package]
 name = "openai-harmony"
-version = "0.0.8-rc.1"
+version = "0.0.8-rc.2"
 edition = "2021"
 license = "Apache-2.0"
-repository = "https://github.com/openai/harmony"
+repository = "https://github.com/tilesprivacy/tiles-harmony"
 description = "OpenAI's response format for its open-weight model series gpt-oss"
 
 [lib]

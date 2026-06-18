@@ -1410,7 +1410,6 @@ impl StreamableParser {
 
         let mut recipient: Option<String> = None;
         let mut content_type_str: Vec<String> = vec![];
-        let remaining_content: Option<String>;
 
         while !parts.is_empty() && parse_recipient_and_type {
             let num_parts = parts.len();
@@ -1438,7 +1437,7 @@ impl StreamableParser {
         };
 
         // Treat all remaining parts as content when not parsing recipient and content type
-        remaining_content = if !parts.is_empty() {
+        let remaining_content: Option<String> = if !parts.is_empty() {
             Some(parts.join(" "))
         } else {
             None
